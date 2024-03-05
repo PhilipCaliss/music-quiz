@@ -173,7 +173,7 @@ prompt_content = f"Roast the music taste of this person based on their top track
 data = {
     "model": "gpt-3.5-turbo",
     "messages": [
-        {"role": "system", "content": "You are a helpful and sarcastic assistant. Never mention the artist or track names in your responses."},
+        {"role": "system", "content": "You are a helpful and sarcastic assistant. You can mention the artists but never the track names"},
         {"role": "user", "content": prompt_content}
     ]
 }
