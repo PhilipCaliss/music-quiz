@@ -149,7 +149,7 @@ print(top_tracks_df)
 csv_file_path = 'top_tracks.csv'
 file_exists = os.path.isfile(csv_file_path)
  
-#Save the DataFrame to a CSV file, without headers if the file already exists
+#Sparar top_tracks.csv
 top_tracks_df.to_csv(csv_file_path, mode='a', header=not file_exists, index=False)
  
 # %%
@@ -167,13 +167,13 @@ top_tracks_list = "\n".join(f"{track['Name']} by {track['Artists']}" for index, 
 print(top_tracks_list)
 
 #Meddelande som skickas till chatGPT
-prompt_content = f"Roast the music taste of this person based on their top tracks:\n{top_tracks_list}"
+prompt_content = f"Summarize this person based on their top tracks:\n{top_tracks_list}"
 
 #Ändra role system för att påverka hur chatGPT svarar.
 data = {
     "model": "gpt-3.5-turbo",
     "messages": [
-        {"role": "system", "content": "You are a helpful and sarcastic assistant. You can mention the artists but never the track names"},
+        {"role": "system", "content": "You are part of a music quiz, your job is to summarize their taste of music and give clues to participants so that they can guess who the user behind the tracks are."},
         {"role": "user", "content": prompt_content}
     ]
 }
@@ -181,20 +181,18 @@ data = {
 #OBS nedan kostar pengar
 response = requests.post(openai_url, headers=headers, json=data)
 
+#Skapar chatgpt_responses.csv från chatgpt
 if response.status_code == 200:
     summary_text = response.json()['choices'][0]['message']['content'].strip()
     print(summary_text)
-    # Create a DataFrame for the response
+
     response_df = pd.DataFrame({
         'User Name': [user_name],
         'ChatGPT Response': [summary_text]
     })
     
-    # Specify the path for the responses CSV file
     responses_csv_file_path = 'chatgpt_responses.csv'
     responses_file_exists = os.path.isfile(responses_csv_file_path)
-    
-    # Save the response DataFrame to a CSV file, appending if the file already exists
     response_df.to_csv(responses_csv_file_path, mode='a', header=not responses_file_exists, index=False)
 else:
     print("Failed to generate summary:", response.text)

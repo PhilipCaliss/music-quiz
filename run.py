@@ -84,18 +84,26 @@ def add_tracks_to_playlist(access_token, playlist_id, track_uris):
         'Authorization': f'Bearer {access_token}',
         'Content-Type': 'application/json',
     }
-    payload = {
-        'uris': track_uris
-    }
-    response = requests.post(url, headers=headers, json=payload)
+    # Split track_uris into batches of 100
+    batches = [track_uris[i:i + 100] for i in range(0, len(track_uris), 100)]
 
-    if response.status_code in [200, 201]:  # Success
-        print(f"Tracks successfully added to playlist {playlist_id}")
-        return response.json()
-    else:
-        print(f"Failed to add tracks to playlist, status code: {response.status_code}")
-        print("Response:", response.text)
-        return None
+    for batch in batches:
+        payload = {
+            'uris': batch
+        }
+        response = requests.post(url, headers=headers, json=payload)
+
+        if response.status_code in [200, 201]:  # Success
+            print(f"Tracks successfully added to playlist {playlist_id}")
+        else:
+            print(f"Failed to add tracks to playlist, status code: {response.status_code}")
+            print("Response:", response.text)
+            # If any batch fails, stop the function and return None
+            return None
+
+    # If all batches are added successfully
+    return {"message": "All tracks added successfully"}
+
 
 def get_spotify_user_id(access_token):
     headers = {
